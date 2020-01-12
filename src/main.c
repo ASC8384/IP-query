@@ -1,12 +1,12 @@
+#include "parse_input.h"
 #include <ctype.h>
 #include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <wchar.h>
 
-struct IP {
+struct IpMessage {
 	int ip_start[5];
 	int ip_end[5];
 	int country[23];
@@ -18,25 +18,25 @@ struct IP {
 	int isp[23];
 	int isp_num;
 };
+typedef struct IpMessage ipm;
 
 int main() {
 	struct timeval func_start;
 	struct timeval func_end;
 	unsigned long  timer;
 
-	char putin[1024];
-	int  ip[5];
-
-	printf("Welcome to IP-query!\n");
-	scanf("%s", putin);
-	sscanf(putin, "%d.%d.%d.%d", ip + 1, ip + 2, ip + 3, ip + 4);
-
+	char  putin[256];
+	int   c;
+	ip	want;
 	FILE *fp;
+	ipm   pos;
+
 	fp = fopen("common/ip.txt", "r");
+	printf("Welcome to IP-query!\n");
+	want = parse(input_string(putin));
 
 	mingw_gettimeofday(&func_start, NULL);
-	struct IP pos;
-	int		  c;
+
 	memset(&pos, 0, sizeof(pos));
 	for(int i = 1; i <= 4; i++)
 		while(isdigit(c = fgetc(fp))) {
@@ -58,10 +58,10 @@ int main() {
 		pos.isp[++pos.isp_num] = c;
 	c = fgetc(fp);
 
-	while((pos.ip_start[1] <= ip[1] && ip[1] <= pos.ip_end[1] &&
-		   pos.ip_start[2] <= ip[2] && ip[2] <= pos.ip_end[2] &&
-		   pos.ip_start[3] <= ip[3] && ip[3] <= pos.ip_end[3] &&
-		   pos.ip_start[4] <= ip[4] && ip[4] <= pos.ip_end[4]) == 0) {
+	while((pos.ip_start[1] <= want.ip[1] && want.ip[1] <= pos.ip_end[1] &&
+		   pos.ip_start[2] <= want.ip[2] && want.ip[2] <= pos.ip_end[2] &&
+		   pos.ip_start[3] <= want.ip[3] && want.ip[3] <= pos.ip_end[3] &&
+		   pos.ip_start[4] <= want.ip[4] && want.ip[4] <= pos.ip_end[4]) == 0) {
 		memset(&pos, 0, sizeof(pos));
 		for(int i = 1; i <= 4; i++)
 			while(isdigit(c = fgetc(fp))) {
@@ -83,7 +83,7 @@ int main() {
 			pos.isp[++pos.isp_num] = c;
 		c = fgetc(fp);
 	}
-	printf("%d.%d.%d.%d ", ip[1], ip[2], ip[3], ip[4]);
+	printf("%d.%d.%d.%d ", want.ip[1], want.ip[2], want.ip[3], want.ip[4]);
 	for(int i = 1; i <= pos.country_num; i++)
 		putchar(pos.country[i]);
 	putchar(' ');
