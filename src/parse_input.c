@@ -33,16 +33,17 @@ static void *ip_list_get_next(void *container_instance, void *container_inner_it
 
 char *input_string(char *des) {
 	char *r = des;
-	scanf("%s", r);
+	// scanf("%s", r);
+	fgets(r, 256, stdin);
 	return des;
 }
 
-iterator *parse(const char *source) {
+iterator *parse(char *source) {
 	inner_itor *p		= NULL;
 	ip *		current = NULL;
 
-	p		= calloc(sizeof(*p), 1);
 	current = calloc(sizeof(*current), 1);
+	p		= calloc(sizeof(*p), 1);
 
 	if(!p)
 		return NULL;
@@ -50,9 +51,10 @@ iterator *parse(const char *source) {
 
 	int count_points = 0;
 	int i			 = 0;
-	while(*(source + i))
+	while(*(source + i)) {
 		if(source[i++] == '.')
 			count_points++;
+	}
 
 	if(strchr(source, '-')) {
 		ip st, ed;
@@ -76,8 +78,18 @@ iterator *parse(const char *source) {
 				}
 			}
 		}
-	} else if(count_points >= 8) {
-		ip node;
+	} else if(count_points >= 6) {
+		ip	node;
+		char *result   = NULL;
+		char  delims[] = " ";
+
+		result = strtok(source, delims);
+		while(result != NULL) {
+			sscanf(result, "%d.%d.%d.%d", &node.ip[1], &node.ip[2], &node.ip[3], &node.ip[4]);
+			IP_LIST_INSERT(current, node);
+			current = current->next;
+			result  = strtok(NULL, delims);
+		}
 	} else { // 0x2D
 		ip node;
 		sscanf(source, "%d.%d.%d.%d", &node.ip[1], &node.ip[2], &node.ip[3], &node.ip[4]);

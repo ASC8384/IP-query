@@ -39,6 +39,7 @@ int main() {
 	fp = fopen("C:/Code/IP-query/src/common/ip.txt", "r");
 	printf("Welcome to IP-query!\n");
 	itor = parse(input_string(putin));
+	putchar('\n');
 
 	do {
 		want = (ip *)get_next(itor);

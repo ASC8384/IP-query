@@ -24,6 +24,6 @@ static bool  ip_list_has_next(void *container_instance, void *container_inner_it
 static void *ip_list_get_next(void *container_instance, void *container_inner_itor);
 
 char *	input_string(char *des);
-iterator *parse(const char *source);
+iterator *parse(char *source);
 
 #endif
