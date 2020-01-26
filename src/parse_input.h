@@ -18,12 +18,12 @@ typedef struct ip_list_inner_itor {
 	ip *item;
 } inner_itor;
 
-static bool ip_list_has_next(void *container_instance, void *container_inner_itor);
+bool IP_LIST_INSERT(ip *list, ip item);
 
+static bool  ip_list_has_next(void *container_instance, void *container_inner_itor);
 static void *ip_list_get_next(void *container_instance, void *container_inner_itor);
 
-char *input_string(char *des);
-
+char *	input_string(char *des);
 iterator *parse(const char *source);
 
 #endif

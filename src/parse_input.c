@@ -1,5 +1,20 @@
 #include "parse_input.h"
 
+bool IP_LIST_INSERT(ip *list, ip item) {
+	ip *pnew;
+	ip *scan = list;
+
+	pnew = calloc(sizeof(*pnew), 1);
+	if(pnew == NULL)
+		return false;
+
+	for(int i = 1; i <= 4; i++)
+		pnew->ip[i] = item.ip[i];
+	scan->next = pnew;
+
+	return true;
+}
+
 static bool ip_list_has_next(void *container_instance, void *container_inner_itor) {
 	inner_itor *p	= (inner_itor *)container_inner_itor;
 	ip *		item = p->item;
@@ -11,7 +26,6 @@ static void *ip_list_get_next(void *container_instance, void *container_inner_it
 	inner_itor *p	= (inner_itor *)container_inner_itor;
 	ip *		item = p->item;
 
-	// p->item = IP_LIST_NEXT(item);
 	p->item = item->next;
 
 	return p->item;
@@ -25,26 +39,50 @@ char *input_string(char *des) {
 
 iterator *parse(const char *source) {
 	inner_itor *p		= NULL;
-	ip *		head	= NULL;
 	ip *		current = NULL;
 
 	p		= calloc(sizeof(*p), 1);
-	head	= calloc(sizeof(*head), 1);
 	current = calloc(sizeof(*current), 1);
 
 	if(!p)
 		return NULL;
-	p->item = head;
+	p->item = current;
 
-	if(!strchr(source, 0x2D)) {
-		sscanf(source, "%d.%d.%d.%d", &current->ip[1], &current->ip[2], &current->ip[3],
-			   &current->ip[4]);
-		head->next = current;
-	} else {
+	int count_points = 0;
+	int i			 = 0;
+	while(*(source + i))
+		if(source[i++] == '.')
+			count_points++;
+
+	if(strchr(source, '-')) {
 		ip st, ed;
 		sscanf(source, "%d.%d.%d.%d-%d.%d.%d.%d", &st.ip[1], &st.ip[2], &st.ip[3], &st.ip[4],
 			   &ed.ip[1], &ed.ip[2], &ed.ip[3], &ed.ip[4]);
+		while(!(st.ip[1] == ed.ip[1] && st.ip[2] == ed.ip[2] && st.ip[3] == ed.ip[3] &&
+				st.ip[4] == ed.ip[4] + 1)) {
+			IP_LIST_INSERT(current, st);
+			current = current->next;
+			st.ip[4]++;
+			if(st.ip[4] == 256) {
+				st.ip[4] = 0;
+				st.ip[3]++;
+				if(st.ip[3] == 256) {
+					st.ip[3] = 0;
+					st.ip[2]++;
+					if(st.ip[2] == 256) {
+						st.ip[2] = 0;
+						st.ip[1]++;
+					}
+				}
+			}
+		}
+	} else if(count_points >= 8) {
+		ip node;
+	} else { // 0x2D
+		ip node;
+		sscanf(source, "%d.%d.%d.%d", &node.ip[1], &node.ip[2], &node.ip[3], &node.ip[4]);
+		IP_LIST_INSERT(current, node);
 	}
 
-	return iterator_new((void *)head, (void *)p, ip_list_has_next, ip_list_get_next);
+	return iterator_new((void *)current, (void *)p, ip_list_has_next, ip_list_get_next);
 }

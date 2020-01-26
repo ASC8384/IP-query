@@ -19,8 +19,8 @@ void putout_ip_msg(ip want, ip_msg pos, unsigned long timer) {
 	putchar(' ');
 	for(int i = 1; i <= pos.isp_num; i++)
 		putchar(pos.isp[i]);
-	putchar('\n');
-	printf("query time = %ld ms\n", timer / 1000);
+	// putchar('\n');
+	printf("| query time = %ld ms\n", timer / 1000);
 }
 
 int main() {
@@ -35,7 +35,8 @@ int main() {
 	FILE * fp;
 	ip_msg pos;
 
-	fp = fopen("../src/common/ip.txt", "r");
+	// fp = fopen("../src/common/ip.txt", "r");
+	fp = fopen("C:/Code/IP-query/src/common/ip.txt", "r");
 	printf("Welcome to IP-query!\n");
 	itor = parse(input_string(putin));
 
