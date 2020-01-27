@@ -72,11 +72,18 @@ iterator *parse(char *source) {
 			temp_num = -1;
 			count_num++;
 			count_bar++;
-		} else if(source[i] == ' ' || source[i] == '\t' || source[i] == '\n') {
+		} else if(source[i] == ' ' || source[i] == '\t') {
+			if(temp_num > 255)
+				return NULL;
+			if(temp_num != -1)
+				count_num++;
+			temp_num = -1;
+		} else if(source[i] == '\n') {
 			if(temp_num > 255 || temp_num == -1)
 				return NULL;
+			if(temp_num != -1)
+				count_num++;
 			temp_num = -1;
-			count_num++;
 		} else {
 			return NULL;
 		}
