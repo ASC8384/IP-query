@@ -6,8 +6,8 @@
 #include <string.h>
 #include <time.h>
 
-void putout_ip_msg(ip want, ip_msg pos, unsigned long timer) {
-	printf("%d.%d.%d.%d ", want.ip[1], want.ip[2], want.ip[3], want.ip[4]);
+void putout_ip_msg(int cnt, ip want, ip_msg pos, unsigned long timer) {
+	printf("[%d]: %d.%d.%d.%d ", cnt, want.ip[1], want.ip[2], want.ip[3], want.ip[4]);
 	for(int i = 1; i <= pos.country_num; i++)
 		putchar(pos.country[i]);
 	putchar(' ');
@@ -26,10 +26,11 @@ void putout_ip_msg(ip want, ip_msg pos, unsigned long timer) {
 int main() {
 	struct timeval   func_start;
 	struct timeval   func_end;
-	static iterator *itor;
+	static iterator *itor = NULL;
 	unsigned long	timer;
 
 	int	c;
+	int	cnt = 0;
 	char   putin[256];
 	ip *   want;
 	FILE * fp;
@@ -37,10 +38,15 @@ int main() {
 
 	// fp = fopen("../src/common/ip.txt", "r");
 	fp = fopen("C:/Code/IP-query/src/common/ip.txt", "r");
-	printf("Welcome to IP-query!\n");
-	itor = parse(input_string(putin));
-	putchar('\n');
+	printf("Welcome to IP-query!\nPlease input the IP address: ");
 
+	itor = parse(input_string(putin));
+	while(itor == NULL) {
+		printf("Input error!\nPlease check up and input the IP address again: ");
+		itor = parse(input_string(putin));
+	}
+
+	putchar('\n');
 	do {
 		want = (ip *)get_next(itor);
 		mingw_gettimeofday(&func_start, NULL);
@@ -48,7 +54,7 @@ int main() {
 		mingw_gettimeofday(&func_end, NULL);
 		timer =
 			1000000 * (func_end.tv_sec - func_start.tv_sec) + func_end.tv_usec - func_start.tv_usec;
-		putout_ip_msg(*want, pos, timer);
+		putout_ip_msg(++cnt, *want, pos, timer);
 	} while(has_next(itor));
 
 	iterator_free(itor);

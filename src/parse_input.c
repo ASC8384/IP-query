@@ -49,17 +49,53 @@ iterator *parse(char *source) {
 		return NULL;
 	p->item = current;
 
-	int count_points = 0;
-	int i			 = 0;
-	while(*(source + i)) {
-		if(source[i++] == '.')
-			count_points++;
-	}
+	int count_point = 0;
+	int count_bar   = 0;
+	int count_num   = 0;
+	int temp_num	= 0;
+	int i			= 0;
 
-	if(strchr(source, '-')) {
+	while(*(source + i)) {
+		if(isdigit(source[i])) {
+			if(temp_num == -1)
+				temp_num = 0;
+			temp_num = temp_num * 10 + source[i] - '0';
+		} else if(source[i] == '.') {
+			if(temp_num > 255 || temp_num == -1)
+				return NULL;
+			temp_num = -1;
+			count_num++;
+			count_point++;
+		} else if(source[i] == '-') {
+			if(temp_num > 255 || temp_num == -1)
+				return NULL;
+			temp_num = -1;
+			count_num++;
+			count_bar++;
+		} else if(source[i] == ' ' || source[i] == '\t' || source[i] == '\n') {
+			if(temp_num > 255 || temp_num == -1)
+				return NULL;
+			temp_num = -1;
+			count_num++;
+		} else {
+			return NULL;
+		}
+		i++;
+	}
+	if(count_bar > 1)
+		return NULL;
+	if(count_point % 3 != 0 || count_point == 0)
+		return NULL;
+	if(count_num % 4 != 0 || count_num == 0 || (count_num != 8 && count_bar == 1))
+		return NULL;
+
+	// if(strchr(source, '-')) {
+	if(count_bar != 0) {
 		ip st, ed;
 		sscanf(source, "%d.%d.%d.%d-%d.%d.%d.%d", &st.ip[1], &st.ip[2], &st.ip[3], &st.ip[4],
 			   &ed.ip[1], &ed.ip[2], &ed.ip[3], &ed.ip[4]);
+		if(st.ip[1] > ed.ip[1] || st.ip[2] > ed.ip[2] || st.ip[3] > ed.ip[3] || st.ip[4] > ed.ip[4])
+			return NULL;
 		while(!(st.ip[1] == ed.ip[1] && st.ip[2] == ed.ip[2] && st.ip[3] == ed.ip[3] &&
 				st.ip[4] == ed.ip[4] + 1)) {
 			IP_LIST_INSERT(current, st);
@@ -78,7 +114,7 @@ iterator *parse(char *source) {
 				}
 			}
 		}
-	} else if(count_points >= 6) {
+	} else if(count_point >= 6) {
 		ip	node;
 		char *result   = NULL;
 		char  delims[] = " ";
