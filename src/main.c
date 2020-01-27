@@ -6,8 +6,8 @@
 #include <string.h>
 #include <time.h>
 
-void putout_ip_msg(int cnt, ip want, ip_msg pos, unsigned long timer) {
-	printf("[%d]: %d.%d.%d.%d ", cnt, want.ip[1], want.ip[2], want.ip[3], want.ip[4]);
+void putout_ip_msg(unsigned long long cnt, ip want, ip_msg pos, unsigned long timer) {
+	printf("[%llu]: %d.%d.%d.%d ", cnt, want.ip[1], want.ip[2], want.ip[3], want.ip[4]);
 	for(int i = 1; i <= pos.country_num; i++)
 		putchar(pos.country[i]);
 	putchar(' ');
@@ -23,41 +23,48 @@ void putout_ip_msg(int cnt, ip want, ip_msg pos, unsigned long timer) {
 	printf("| query time = %ld ms\n", timer / 1000);
 }
 
-int main() {
-	struct timeval   func_start;
-	struct timeval   func_end;
-	static iterator *itor = NULL;
-	unsigned long	timer;
+int main(int agrc, char *argv[]) {
+	struct timeval func_start;
+	struct timeval func_end;
 
-	int	c;
-	int	cnt = 0;
-	char   putin[256];
-	ip *   want;
 	FILE * fp;
+	ip *   want;
 	ip_msg pos;
 
-	// fp = fopen("../src/common/ip.txt", "r");
-	fp = fopen("C:/Code/IP-query/src/common/ip.txt", "r");
-	printf("Welcome to IP-query!\nPlease input the IP address: ");
+	unsigned long long cnt = 0;
 
-	itor = parse(input_string(putin));
-	while(itor == NULL) {
-		printf("Input error!\nPlease check up and input the IP address again: ");
-		itor = parse(input_string(putin));
+	fp = fopen("C:/Code/IP-query/src/common/ip.txt", "r");
+	printf("Welcome to IP-query!");
+
+	while(1) {
+		char putin[256];
+		printf("\nPlease input the IP address: ");
+		input_string(putin);
+		if(strchr(putin, 'q'))
+			goto gotohere;
+		iterator *itor = parse(putin);
+		while(itor == NULL) {
+			printf("Input error!\nPlease check up and input the IP address again: ");
+			input_string(putin);
+			if(strchr(putin, 'q'))
+				goto gotohere;
+			itor = parse(putin);
+		}
+
+		putchar('\n');
+		do {
+			want = (ip *)get_next(itor);
+			mingw_gettimeofday(&func_start, NULL);
+			pos = match_ip(*want, fp);
+			mingw_gettimeofday(&func_end, NULL);
+			unsigned long timer = 1000000 * (func_end.tv_sec - func_start.tv_sec) +
+								  func_end.tv_usec - func_start.tv_usec;
+			putout_ip_msg(++cnt, *want, pos, timer);
+		} while(has_next(itor));
+		iterator_free(itor);
 	}
 
-	putchar('\n');
-	do {
-		want = (ip *)get_next(itor);
-		mingw_gettimeofday(&func_start, NULL);
-		pos = match_ip(*want, fp);
-		mingw_gettimeofday(&func_end, NULL);
-		timer =
-			1000000 * (func_end.tv_sec - func_start.tv_sec) + func_end.tv_usec - func_start.tv_usec;
-		putout_ip_msg(++cnt, *want, pos, timer);
-	} while(has_next(itor));
-
-	iterator_free(itor);
+gotohere:
 	fclose(fp);
 
 	return 0;

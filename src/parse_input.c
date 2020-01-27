@@ -89,7 +89,6 @@ iterator *parse(char *source) {
 	if(count_num % 4 != 0 || count_num == 0 || (count_num != 8 && count_bar == 1))
 		return NULL;
 
-	// if(strchr(source, '-')) {
 	if(count_bar != 0) {
 		ip st, ed;
 		sscanf(source, "%d.%d.%d.%d-%d.%d.%d.%d", &st.ip[1], &st.ip[2], &st.ip[3], &st.ip[4],
@@ -126,7 +125,7 @@ iterator *parse(char *source) {
 			current = current->next;
 			result  = strtok(NULL, delims);
 		}
-	} else { // 0x2D
+	} else {
 		ip node;
 		sscanf(source, "%d.%d.%d.%d", &node.ip[1], &node.ip[2], &node.ip[3], &node.ip[4]);
 		IP_LIST_INSERT(current, node);
