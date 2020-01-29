@@ -4,9 +4,18 @@ cmake_minimum_required (VERSION 2.8)
 # 项目信息
 project (IP-query)
 
+# 头文件
+include_directories(./lib/iniparser)
+
 # 查找当前目录下的所有源文件
 # 并将名称保存到 DIR_SRCS 变量
 aux_source_directory(./src DIR_SRCS)
 
+# 添加子目录
+add_subdirectory(./lib/iniparser)
+
 # 指定生成目标
 add_executable(main ${DIR_SRCS})
+
+# 添加链接库
+target_link_libraries(main iniparser)
