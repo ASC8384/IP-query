@@ -19,12 +19,14 @@ typedef struct ip_list_inner_itor {
 	ip *item;
 } inner_itor;
 
-bool IP_LIST_INSERT(ip *list, ip item);
+// attend ip list
+bool IP_LIST_INSERT(ip *item, ip *list);
 
 static bool  ip_list_has_next(void *container_instance, void *container_inner_itor);
 static void *ip_list_get_next(void *container_instance, void *container_inner_itor);
 
 char *	input_string(char *des);
-iterator *parse(char *source);
+char	  parse_input(const char *putin);
+iterator *parse_ip(char *source);
 
 #endif

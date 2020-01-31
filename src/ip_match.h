@@ -20,9 +20,9 @@ struct IpMessage {
 };
 typedef struct IpMessage ip_msg;
 
-bool   IS_MATCH(const ip want, const ip_msg pos);
+bool   IS_MATCH(const ip *want, const ip_msg *pos);
 ip_msg NEXT_IP(FILE *fp);
 
-ip_msg match_ip(const ip want, FILE *fp);
+ip_msg match_ip(const ip *want, FILE *fp);
 
 #endif
