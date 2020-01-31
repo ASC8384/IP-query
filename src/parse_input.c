@@ -31,16 +31,20 @@ static void *ip_list_get_next(void *container_instance, void *container_inner_it
 	return p->item;
 }
 
-char *input_string(char *des) {
-	char *r = des;
-	// scanf("%s", r);
-	fgets(r, 256, stdin);
+char *parse_file(char *des) {
+	char *r			 = des;
+	r[strlen(r) - 1] = '\0';
+	FILE *fp		 = fopen(r + 2, "r");
+	fgets(r, 256, fp);
+	fclose(fp);
 	return des;
 }
 
 char parse_input(const char *putin) {
 	if(strchr(putin, 'q') && strlen(putin) == 2)
 		return 'q';
+	if(strchr(putin, 'f') && strlen(putin) > 2)
+		return 'f';
 
 	int count_point = 0;
 	int count_bar   = 0;

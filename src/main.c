@@ -60,9 +60,14 @@ int main(int agrc, char *argv[]) {
 		char	  putin[256];
 		iterator *itor = NULL;
 	fail_parse_input:
-		input_string(putin);
+		// get input
+		fgets(putin, 256, stdin);
 		switch(parse_input(putin)) {
 		case 'y':
+			itor = parse_ip(putin);
+			break;
+		case 'f':
+			parse_file(putin);
 			itor = parse_ip(putin);
 			break;
 		case 'q':
@@ -93,6 +98,5 @@ main_exit : {
 	iniparser_freedict(ini);
 	fclose(file_ip);
 }
-
 	return 0;
 }

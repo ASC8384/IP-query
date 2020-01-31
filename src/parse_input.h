@@ -8,10 +8,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define ip_list_t ip
-
+typedef unsigned short int_2;
 typedef struct IP {
-	int		   ip[5];
+	int_2	  ip[5];
 	struct IP *next;
 } ip;
 
@@ -25,7 +24,7 @@ bool IP_LIST_INSERT(ip *item, ip *list);
 static bool  ip_list_has_next(void *container_instance, void *container_inner_itor);
 static void *ip_list_get_next(void *container_instance, void *container_inner_itor);
 
-char *	input_string(char *des);
+char *	parse_file(char *des);
 char	  parse_input(const char *putin);
 iterator *parse_ip(char *source);
 
