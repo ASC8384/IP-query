@@ -5,9 +5,15 @@
 #include <stdio.h>
 #include <time.h>
 
+#define T_COLOR_NONE "\033[0m"
+#define T_COLOR_ORANGE "\033[0;33m" // BROWN
+#define T_COLOR_LIGHT_CYAN "\033[1;36m"
+#define T_COLOR_LIGHT_RED "\033[1;31m"
+
 void putout_ip_msg(const show_msg *is_show, const unsigned long cnt, const ip *want,
 				   const ip_msg *pos, const unsigned long timer) {
-	printf("[%lu]: %d.%d.%d.%d ", cnt, want->ip[1], want->ip[2], want->ip[3], want->ip[4]);
+	printf("%s[%lu]%s %s%d.%d.%d.%d%s ", T_COLOR_ORANGE, cnt, T_COLOR_NONE, T_COLOR_LIGHT_CYAN,
+		   want->ip[1], want->ip[2], want->ip[3], want->ip[4], T_COLOR_NONE);
 	if(is_show->country) {
 		for(int i = 1; i <= pos->country_num; i++)
 			putchar(pos->country[i]);
@@ -74,7 +80,8 @@ int main(int agrc, char *argv[]) {
 			goto main_exit;
 			break;
 		default:
-			printf("Input error!\nPlease check up and input the IP address again: ");
+			printf("%sInput error!%s\nPlease check up and input the IP address again: ",
+				   T_COLOR_LIGHT_RED, T_COLOR_NONE);
 			goto fail_parse_input;
 		}
 
