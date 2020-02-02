@@ -12,10 +12,10 @@ ip_msg NEXT_IP(FILE *fp) {
 	ip_msg pos;
 	memset(&pos, 0, sizeof(pos));
 
-	for(int i = 1; i <= 4; i++)
+	for(int i = 0; i <= 3; i++)
 		while(isdigit(c = fgetc(fp)))
 			pos.ip_start[i] = pos.ip_start[i] * 10 + c - '0';
-	for(int i = 1; i <= 4; i++)
+	for(int i = 0; i <= 3; i++)
 		while(isdigit(c = fgetc(fp)))
 			pos.ip_end[i] = pos.ip_end[i] * 10 + c - '0';
 	while((c = fgetc(fp)) != 0x7C)

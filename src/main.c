@@ -13,8 +13,8 @@
 
 void putout_ip_msg(const show_msg *is_show, const unsigned long cnt, const ip *want,
 				   const ip_msg *pos, const unsigned long timer) {
-	printf("%s[%lu]%s %s%d.%d.%d.%d%s ", T_COLOR_ORANGE, cnt, T_COLOR_NONE, T_COLOR_LIGHT_CYAN,
-		   want->ip[1], want->ip[2], want->ip[3], want->ip[4], T_COLOR_NONE);
+	printf("%s[%lu]%s %s%hd.%hd.%hd.%hd%s ", T_COLOR_ORANGE, cnt, T_COLOR_NONE, T_COLOR_LIGHT_CYAN,
+		   want->ip[0], want->ip[1], want->ip[2], want->ip[3], T_COLOR_NONE);
 	if(is_show->country) {
 		for(int i = 1; i <= pos->country_num; i++)
 			putchar(pos->country[i]);

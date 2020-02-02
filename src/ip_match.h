@@ -8,11 +8,12 @@
 
 typedef unsigned char  int_1;
 typedef unsigned short char_2;
+typedef unsigned short int_2;
 
 typedef struct IpMessage {
 	// ip[4] == ip[0]
-	int	ip_start[4];
-	int	ip_end[4];
+	int_2  ip_start[4];
+	int_2  ip_end[4];
 	char_2 country[20];
 	char_2 province[20];
 	char_2 city[20];

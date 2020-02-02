@@ -8,7 +8,7 @@ bool IP_LIST_INSERT(ip *item, ip *list) {
 	if(pnew == NULL)
 		return false;
 
-	for(int i = 1; i <= 4; i++)
+	for(int i = 0; i <= 3; i++)
 		pnew->ip[i] = item->ip[i];
 	scan->next = pnew;
 
@@ -123,26 +123,26 @@ iterator *parse_ip(char *source) {
 	// ip: a1.b1.c1.d1-a2.b2.c2.d2
 	if(count_bar != 0) {
 		ip st, ed;
-		sscanf(source, "%d.%d.%d.%d-%d.%d.%d.%d", &st.ip[1], &st.ip[2], &st.ip[3], &st.ip[0],
-			   &ed.ip[1], &ed.ip[2], &ed.ip[3], &ed.ip[0]);
-		if(st.ip[1] > ed.ip[1] || st.ip[2] > ed.ip[2] || st.ip[3] > ed.ip[3] || st.ip[0] > ed.ip[0])
+		sscanf(source, "%hd.%hd.%hd.%hd-%hd.%hd.%hd.%hd", &st.ip[0], &st.ip[1], &st.ip[2],
+			   &st.ip[3], &ed.ip[0], &ed.ip[1], &ed.ip[2], &ed.ip[3]);
+		if(st.ip[0] > ed.ip[0] || st.ip[1] > ed.ip[1] || st.ip[2] > ed.ip[2] || st.ip[3] > ed.ip[3])
 			return NULL;
-		while(!(st.ip[1] == ed.ip[1] && st.ip[2] == ed.ip[2] && st.ip[3] == ed.ip[3] &&
-				st.ip[0] == ed.ip[0] + 1)) {
+		while(!(st.ip[0] == ed.ip[0] && st.ip[1] == ed.ip[1] && st.ip[2] == ed.ip[2] &&
+				st.ip[3] == ed.ip[3] + 1)) {
 			IP_LIST_INSERT(&st, current);
 			current = current->next;
 			// ip address increase progressively
-			st.ip[0]++;
-			if(st.ip[0] == 256) {
-				st.ip[0] = 0;
-				st.ip[3]++;
-				if(st.ip[3] == 256) {
-					st.ip[3] = 0;
-					st.ip[2]++;
-					if(st.ip[2] == 256) {
-						st.ip[2] = 0;
-						st.ip[1]++;
-						if(st.ip[1] > 256)
+			st.ip[3]++;
+			if(st.ip[3] == 256) {
+				st.ip[3] = 0;
+				st.ip[2]++;
+				if(st.ip[2] == 256) {
+					st.ip[2] = 0;
+					st.ip[1]++;
+					if(st.ip[1] == 256) {
+						st.ip[1] = 0;
+						st.ip[0]++;
+						if(st.ip[0] > 256)
 							return NULL;
 					}
 				}
@@ -156,7 +156,7 @@ iterator *parse_ip(char *source) {
 
 		result = strtok(source, delims);
 		while(result != NULL) {
-			sscanf(result, "%d.%d.%d.%d", &node.ip[1], &node.ip[2], &node.ip[3], &node.ip[4]);
+			sscanf(result, "%hd.%hd.%hd.%hd", &node.ip[0], &node.ip[1], &node.ip[2], &node.ip[3]);
 			IP_LIST_INSERT(&node, current);
 			current = current->next;
 			result  = strtok(NULL, delims);
@@ -165,7 +165,7 @@ iterator *parse_ip(char *source) {
 	} // ip :a.b.c.d
 	else {
 		ip node;
-		sscanf(source, "%d.%d.%d.%d", &node.ip[1], &node.ip[2], &node.ip[3], &node.ip[0]);
+		sscanf(source, "%hd.%hd.%hd.%hd", &node.ip[0], &node.ip[1], &node.ip[2], &node.ip[3]);
 		IP_LIST_INSERT(&node, current);
 	}
 
