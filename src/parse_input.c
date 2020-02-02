@@ -99,26 +99,27 @@ char parse_input(const char *putin) {
 				count_num++;
 			temp_num = -1;
 		} else if(putin[i] == '\n') {
-			if(temp_num > 255 || temp_num == -1)
+			if(temp_num > 255)
 				return 'w';
 			if(temp_num != -1)
 				count_num++;
 			temp_num = -1;
 		} else if(putin[i] == '*') {
-			if(putin[i + 1] != '.')
-				return 'w';
+			temp_num = 0;
 		} else if(putin[i] == '?') {
+			temp_num = 0;
 		} else {
 			return 'w';
 		}
 		i++;
 	}
+
 	if(count_bar > 1)
 		return 'w';
 	if(count_point % 3 != 0 || count_point == 0)
 		return 'w';
-	if(count_num % 4 != 0 || count_num == 0 || (count_num != 8 && count_bar == 1))
-		return 'w';
+	// if(count_num % 4 != 0 || count_num == 0 || (count_num != 8 && count_bar == 1))
+	// return 'w';
 	if(count_bar == 1) {
 		ip st, ed;
 		sscanf(putin, "%hu.%hu.%hu.%hu-%hu.%hu.%hu.%hu", &st.ip[0], &st.ip[1], &st.ip[2], &st.ip[3],
@@ -158,10 +159,13 @@ iterator *parse_ip(char *source) {
 
 	// ip: a1.b1.c1.d1-a2.b2.c2.d2
 	if(has_bar) {
-		ip st, ed;
-		sscanf(source, "%hu.%hu.%hu.%hu-%hu.%hu.%hu.%hu", &st.ip[0], &st.ip[1], &st.ip[2],
-			   &st.ip[3], &ed.ip[0], &ed.ip[1], &ed.ip[2], &ed.ip[3]);
-		IP_LIST_INSERT_CONTINUOUS(&st, &ed, current);
+		if(has_wildcard) {
+		} else {
+			ip st, ed;
+			sscanf(source, "%hu.%hu.%hu.%hu-%hu.%hu.%hu.%hu", &st.ip[0], &st.ip[1], &st.ip[2],
+				   &st.ip[3], &ed.ip[0], &ed.ip[1], &ed.ip[2], &ed.ip[3]);
+			IP_LIST_INSERT_CONTINUOUS(&st, &ed, current);
+		}
 	} // ip: a.b.c.d[]
 	else if(count_point >= 6) {
 		ip	node;
@@ -175,12 +179,35 @@ iterator *parse_ip(char *source) {
 			current = current->next;
 			result  = strtok(NULL, delims);
 		}
-
-	} // ip :a.b.c.d
+	} // ip: a.b.c.d
 	else {
-		ip node;
-		sscanf(source, "%hu.%hu.%hu.%hu", &node.ip[0], &node.ip[1], &node.ip[2], &node.ip[3]);
-		IP_LIST_INSERT(&node, current);
+		if(has_wildcard) {
+			ip  st, ed;
+			int item   = 0;
+			int ip_num = 0;
+			int i	  = 0;
+			while(*(source + i)) {
+				if(isdigit(source[i])) {
+					ip_num = ip_num * 10 + source[i] - '0';
+				} else if(source[i] == '*') {
+					st.ip[item] = 0;
+					ed.ip[item] = 255;
+					item++;
+				} else if(source[i] == '?') {
+					ip_num = ip_num * 10;
+				} else if(source[i] == '.' && source[i - 1] != '*') {
+					st.ip[item] = ed.ip[item] = ip_num;
+					ip_num					  = 0;
+					item++;
+				}
+				i++;
+			}
+			IP_LIST_INSERT_CONTINUOUS(&st, &ed, current);
+		} else {
+			ip node;
+			sscanf(source, "%hu.%hu.%hu.%hu", &node.ip[0], &node.ip[1], &node.ip[2], &node.ip[3]);
+			IP_LIST_INSERT(&node, current);
+		}
 	}
 
 	return iterator_new((void *)current, (void *)p, ip_list_has_next, ip_list_get_next);
