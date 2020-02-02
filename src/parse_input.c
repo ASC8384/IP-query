@@ -182,25 +182,45 @@ iterator *parse_ip(char *source) {
 	} // ip: a.b.c.d
 	else {
 		if(has_wildcard) {
-			ip  st, ed;
-			int item   = 0;
-			int ip_num = 0;
-			int i	  = 0;
+			ip   st, ed;
+			int  item						= 0;
+			int  i							= 0;
+			bool has_wildcard_question_mark = false;
 			while(*(source + i)) {
-				if(isdigit(source[i])) {
-					ip_num = ip_num * 10 + source[i] - '0';
-				} else if(source[i] == '*') {
-					st.ip[item] = 0;
-					ed.ip[item] = 255;
-					item++;
-				} else if(source[i] == '?') {
-					ip_num = ip_num * 10;
-				} else if(source[i] == '.' && source[i - 1] != '*') {
-					st.ip[item] = ed.ip[item] = ip_num;
-					ip_num					  = 0;
-					item++;
+				if(source[i] == '?') {
+					has_wildcard_question_mark = true;
 				}
 				i++;
+			}
+			i = 0;
+			if(has_wildcard_question_mark) {
+				char copy[256];
+				strcpy(copy, source);
+				while(*(source + i)) {
+					if(source[i] == '?') {
+						source[i] = '9';
+						copy[i]   = '0';
+					}
+					i++;
+				}
+				sscanf(copy, "%hu.%hu.%hu.%hu", &st.ip[0], &st.ip[1], &st.ip[2], &st.ip[3]);
+				sscanf(source, "%hu.%hu.%hu.%hu", &ed.ip[0], &ed.ip[1], &ed.ip[2], &ed.ip[3]);
+			} else {
+				int ip_num = 0;
+				while(*(source + i)) {
+					if(isdigit(source[i])) {
+						ip_num = ip_num * 10 + source[i] - '0';
+					} else if(source[i] == '*') {
+						st.ip[item] = 0;
+						ed.ip[item] = 255;
+						item++;
+					} else if(source[i] == '.' && source[i - 1] != '*') {
+						st.ip[item] = ed.ip[item] = ip_num;
+						ip_num					  = 0;
+						item++;
+					}
+					i++;
+				}
 			}
 			IP_LIST_INSERT_CONTINUOUS(&st, &ed, current);
 		} else {
