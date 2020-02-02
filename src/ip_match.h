@@ -10,15 +10,16 @@ typedef unsigned char  int_1;
 typedef unsigned short char_2;
 
 typedef struct IpMessage {
-	int	ip_start[5];
-	int	ip_end[5];
-	char_2 country[23];
+	// ip[4] == ip[0]
+	int	ip_start[4];
+	int	ip_end[4];
+	char_2 country[20];
+	char_2 province[20];
+	char_2 city[20];
+	char_2 isp[20];
 	int_1  country_num;
-	char_2 province[23];
 	int_1  province_num;
-	char_2 city[23];
 	int_1  city_num;
-	char_2 isp[23];
 	int_1  isp_num;
 } ip_msg;
 

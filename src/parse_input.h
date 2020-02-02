@@ -10,7 +10,8 @@
 
 typedef unsigned short int_2;
 typedef struct IP {
-	int_2	  ip[5];
+	// ip[4] == ip[0]
+	int_2	  ip[4];
 	struct IP *next;
 } ip;
 

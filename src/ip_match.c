@@ -4,7 +4,7 @@ bool IS_MATCH(const ip *want, const ip_msg *pos) {
 	return (pos->ip_start[1] <= want->ip[1] && want->ip[1] <= pos->ip_end[1] &&
 			pos->ip_start[2] <= want->ip[2] && want->ip[2] <= pos->ip_end[2] &&
 			pos->ip_start[3] <= want->ip[3] && want->ip[3] <= pos->ip_end[3] &&
-			pos->ip_start[4] <= want->ip[4] && want->ip[4] <= pos->ip_end[4]);
+			pos->ip_start[0] <= want->ip[0] && want->ip[0] <= pos->ip_end[0]);
 }
 
 ip_msg NEXT_IP(FILE *fp) {

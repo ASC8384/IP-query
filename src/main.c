@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <time.h>
 
+// output colors
 #define T_COLOR_NONE "\033[0m"
 #define T_COLOR_ORANGE "\033[0;33m" // BROWN
 #define T_COLOR_LIGHT_CYAN "\033[1;36m"
