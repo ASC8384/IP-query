@@ -21,6 +21,7 @@ typedef struct ip_list_inner_itor {
 
 // attend ip list
 bool IP_LIST_INSERT(ip *item, ip *list);
+void IP_LIST_INSERT_CONTINUOUS(ip *st, ip *ed, ip *current);
 
 static bool  ip_list_has_next(void *container_instance, void *container_inner_itor);
 static void *ip_list_get_next(void *container_instance, void *container_inner_itor);

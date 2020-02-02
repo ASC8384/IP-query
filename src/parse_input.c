@@ -15,6 +15,28 @@ bool IP_LIST_INSERT(ip *item, ip *list) {
 	return true;
 }
 
+void IP_LIST_INSERT_CONTINUOUS(ip *st, ip *ed, ip *current) {
+	while(!(st->ip[0] == ed->ip[0] && st->ip[1] == ed->ip[1] && st->ip[2] == ed->ip[2] &&
+			st->ip[3] == ed->ip[3] + 1)) {
+		IP_LIST_INSERT(st, current);
+		current = current->next;
+		// ip address increase progressively
+		st->ip[3]++;
+		if(st->ip[3] == 256) {
+			st->ip[3] = 0;
+			st->ip[2]++;
+			if(st->ip[2] == 256) {
+				st->ip[2] = 0;
+				st->ip[1]++;
+				if(st->ip[1] == 256) {
+					st->ip[1] = 0;
+					st->ip[0]++;
+				}
+			}
+		}
+	}
+}
+
 static bool ip_list_has_next(void *container_instance, void *container_inner_itor) {
 	inner_itor *p	= (inner_itor *)container_inner_itor;
 	ip *		item = p->item;
@@ -81,6 +103,8 @@ char parse_input(const char *putin) {
 				count_num++;
 			temp_num = -1;
 		} else if(putin[i] == '*') {
+			if(putin[i + 1] != '.')
+				return 'w';
 		} else if(putin[i] == '?') {
 		} else {
 			return 'w';
@@ -93,7 +117,13 @@ char parse_input(const char *putin) {
 		return 'w';
 	if(count_num % 4 != 0 || count_num == 0 || (count_num != 8 && count_bar == 1))
 		return 'w';
-
+	if(count_bar == 1) {
+		ip st, ed;
+		sscanf(putin, "%hu.%hu.%hu.%hu-%hu.%hu.%hu.%hu", &st.ip[0], &st.ip[1], &st.ip[2], &st.ip[3],
+			   &ed.ip[0], &ed.ip[1], &ed.ip[2], &ed.ip[3]);
+		if(st.ip[0] > ed.ip[0] || st.ip[1] > ed.ip[1] || st.ip[2] > ed.ip[2] || st.ip[3] > ed.ip[3])
+			return 'w';
+	}
 	return 'y';
 }
 
@@ -108,46 +138,28 @@ iterator *parse_ip(char *source) {
 		return NULL;
 	p->item = current;
 
-	int count_point = 0;
-	int count_bar   = 0;
-	int i			= 0;
+	int  count_point  = 0;
+	bool has_bar	  = false;
+	bool has_wildcard = false;
+	int  i			  = 0;
 	while(*(source + i)) {
 		if(source[i] == '.') {
 			count_point++;
 		} else if(source[i] == '-') {
-			count_bar++;
+			has_bar = true;
+			break;
+		} else if(source[i] == '*' || source[i] == '?') {
+			has_wildcard = true;
 		}
 		i++;
 	}
 
 	// ip: a1.b1.c1.d1-a2.b2.c2.d2
-	if(count_bar != 0) {
+	if(has_bar) {
 		ip st, ed;
-		sscanf(source, "%hd.%hd.%hd.%hd-%hd.%hd.%hd.%hd", &st.ip[0], &st.ip[1], &st.ip[2],
+		sscanf(source, "%hu.%hu.%hu.%hu-%hu.%hu.%hu.%hu", &st.ip[0], &st.ip[1], &st.ip[2],
 			   &st.ip[3], &ed.ip[0], &ed.ip[1], &ed.ip[2], &ed.ip[3]);
-		if(st.ip[0] > ed.ip[0] || st.ip[1] > ed.ip[1] || st.ip[2] > ed.ip[2] || st.ip[3] > ed.ip[3])
-			return NULL;
-		while(!(st.ip[0] == ed.ip[0] && st.ip[1] == ed.ip[1] && st.ip[2] == ed.ip[2] &&
-				st.ip[3] == ed.ip[3] + 1)) {
-			IP_LIST_INSERT(&st, current);
-			current = current->next;
-			// ip address increase progressively
-			st.ip[3]++;
-			if(st.ip[3] == 256) {
-				st.ip[3] = 0;
-				st.ip[2]++;
-				if(st.ip[2] == 256) {
-					st.ip[2] = 0;
-					st.ip[1]++;
-					if(st.ip[1] == 256) {
-						st.ip[1] = 0;
-						st.ip[0]++;
-						if(st.ip[0] > 256)
-							return NULL;
-					}
-				}
-			}
-		}
+		IP_LIST_INSERT_CONTINUOUS(&st, &ed, current);
 	} // ip: a.b.c.d[]
 	else if(count_point >= 6) {
 		ip	node;
@@ -156,7 +168,7 @@ iterator *parse_ip(char *source) {
 
 		result = strtok(source, delims);
 		while(result != NULL) {
-			sscanf(result, "%hd.%hd.%hd.%hd", &node.ip[0], &node.ip[1], &node.ip[2], &node.ip[3]);
+			sscanf(result, "%hu.%hu.%hu.%hu", &node.ip[0], &node.ip[1], &node.ip[2], &node.ip[3]);
 			IP_LIST_INSERT(&node, current);
 			current = current->next;
 			result  = strtok(NULL, delims);
@@ -165,7 +177,7 @@ iterator *parse_ip(char *source) {
 	} // ip :a.b.c.d
 	else {
 		ip node;
-		sscanf(source, "%hd.%hd.%hd.%hd", &node.ip[0], &node.ip[1], &node.ip[2], &node.ip[3]);
+		sscanf(source, "%hu.%hu.%hu.%hu", &node.ip[0], &node.ip[1], &node.ip[2], &node.ip[3]);
 		IP_LIST_INSERT(&node, current);
 	}
 
