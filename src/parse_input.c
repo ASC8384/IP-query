@@ -17,7 +17,7 @@ bool IP_LIST_INSERT(ip *item, ip *list) {
 
 void IP_LIST_INSERT_CONTINUOUS(ip *st, ip *ed, ip *current) {
 	while(!(st->ip[0] == ed->ip[0] && st->ip[1] == ed->ip[1] && st->ip[2] == ed->ip[2] &&
-			st->ip[3] == ed->ip[3] + 1)) {
+			st->ip[3] == ed->ip[3])) {
 		IP_LIST_INSERT(st, current);
 		current = current->next;
 		// ip address increase progressively
@@ -35,6 +35,8 @@ void IP_LIST_INSERT_CONTINUOUS(ip *st, ip *ed, ip *current) {
 			}
 		}
 	}
+	IP_LIST_INSERT(ed, current);
+	current = current->next;
 }
 
 static bool ip_list_has_next(void *container_instance, void *container_inner_itor) {
