@@ -39,7 +39,7 @@ void PUTOUT_IP_MSG(const show_msg *is_show, const unsigned long cnt, const ip *w
 
 // match and print ip massage
 void PRINT_MATCH_IP_MSG(struct timeval *func_start, struct timeval *func_end, ip *want,
-						FILE *file_ip, show_msg *is_show, unsigned long *cnt, ip_msg *pos,
+						char *file_ip, show_msg *is_show, unsigned long *cnt, ip_msg *pos,
 						iterator *itor) {
 	putchar('\n');
 	do {
@@ -54,12 +54,26 @@ void PRINT_MATCH_IP_MSG(struct timeval *func_start, struct timeval *func_end, ip
 	iterator_free(itor);
 }
 
+char *read_all_file(char *filename) {
+	char *text = NULL;
+	FILE *fp   = fopen(filename, "r");
+	fseek(fp, 0, SEEK_END);
+	unsigned long long file_len;
+	file_len = ftell(fp);
+	text	 = (char *)malloc(file_len + 1);
+	rewind(fp);
+	fread(text, sizeof(char), file_len, fp);
+	text[file_len] = '\0';
+	fclose(fp);
+	return text;
+}
+
 int main(int argc, char *argv[]) {
 	struct timeval func_start;
 	struct timeval func_end;
 	dictionary *   ini		= NULL;
+	char *		   file_ip  = NULL;
 	char *		   ini_name = NULL;
-	FILE *		   file_ip  = NULL;
 	ip *		   want		= NULL;
 	ip_msg		   pos;
 	show_msg	   is_show;
@@ -74,7 +88,7 @@ int main(int argc, char *argv[]) {
 	iniparser_get_is_show(ini, &is_show);
 
 	printf("Welcome to IP-query!");
-	file_ip = fopen("C:/Code/IP-query/src/common/ip.txt", "r");
+	file_ip = read_all_file("C:/Code/IP-query/src/common/ip.txt");
 
 	char putin[256];
 	putin[0] = '\0';
@@ -97,12 +111,9 @@ int main(int argc, char *argv[]) {
 			fgets(putin, 256, stdin);
 		}
 		switch(parse_input(putin)) {
-		case 'y':
-			itor = parse_ip(putin);
-			PRINT_MATCH_IP_MSG(&func_start, &func_end, want, file_ip, &is_show, &cnt, &pos, itor);
-			break;
 		case 'f':
 			parse_file(putin);
+		case 'y':
 			itor = parse_ip(putin);
 			PRINT_MATCH_IP_MSG(&func_start, &func_end, want, file_ip, &is_show, &cnt, &pos, itor);
 			break;
@@ -123,7 +134,7 @@ int main(int argc, char *argv[]) {
 main_exit : {
 	iniparser_save(ini, ini_name);
 	iniparser_freedict(ini);
-	fclose(file_ip);
+	free(file_ip);
 }
 	return 0;
 }
