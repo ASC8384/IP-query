@@ -10,7 +10,7 @@
 #define T_COLOR_LIGHT_CYAN "\033[1;36m"
 #define T_COLOR_LIGHT_RED "\033[1;31m"
 
-void putout_ip_msg(const show_msg *is_show, const unsigned long cnt, const ip *want,
+void PUTOUT_IP_MSG(const show_msg *is_show, const unsigned long cnt, const ip *want,
 				   const ip_msg *pos, const unsigned long timer) {
 	printf("%s[%lu]%s %s%hu.%hu.%hu.%hu%s ", T_COLOR_ORANGE, cnt, T_COLOR_NONE, T_COLOR_LIGHT_CYAN,
 		   want->ip[0], want->ip[1], want->ip[2], want->ip[3], T_COLOR_NONE);
@@ -37,7 +37,24 @@ void putout_ip_msg(const show_msg *is_show, const unsigned long cnt, const ip *w
 	printf("| query time = %ld ms\n", timer / 1000);
 }
 
-int main(int agrc, char *argv[]) {
+// match and print ip massage
+void PRINT_MATCH_IP_MSG(struct timeval *func_start, struct timeval *func_end, ip *want,
+						FILE *file_ip, show_msg *is_show, unsigned long *cnt, ip_msg *pos,
+						iterator *itor) {
+	putchar('\n');
+	do {
+		want = (ip *)get_next(itor);
+		mingw_gettimeofday(func_start, NULL);
+		*pos = match_ip(want, file_ip);
+		mingw_gettimeofday(func_end, NULL);
+		unsigned long timer = 1000000 * (func_end->tv_sec - func_start->tv_sec) +
+							  func_end->tv_usec - func_start->tv_usec;
+		PUTOUT_IP_MSG(is_show, ++(*cnt), want, pos, timer);
+	} while(has_next(itor));
+	iterator_free(itor);
+}
+
+int main(int argc, char *argv[]) {
 	struct timeval func_start;
 	struct timeval func_end;
 	dictionary *   ini		= NULL;
@@ -46,6 +63,7 @@ int main(int agrc, char *argv[]) {
 	ip *		   want		= NULL;
 	ip_msg		   pos;
 	show_msg	   is_show;
+	bool		   has_command = false;
 
 	// process ini
 	ini_name = "ip-query.ini";
@@ -58,23 +76,35 @@ int main(int agrc, char *argv[]) {
 	printf("Welcome to IP-query!");
 	file_ip = fopen("C:/Code/IP-query/src/common/ip.txt", "r");
 
-	unsigned long cnt = 0;
-	while(1) {
-		printf("\nPlease input the IP address: ");
+	char putin[256];
+	putin[0] = '\0';
+	if(argc >= 2) {
+		has_command = true;
+		for(int i = 1; i < argc; i++) {
+			strcat(putin, argv[i]);
+			strcat(putin, " ");
+		}
+	}
 
-		// process the putin_string
-		char	  putin[256];
+	unsigned long cnt = 0;
+	do {
 		iterator *itor = NULL;
+	// get input
 	fail_parse_input:
-		// get input
-		fgets(putin, 256, stdin);
+		// process the putin_string
+		if(!has_command) {
+			printf("\nPlease input the IP address: ");
+			fgets(putin, 256, stdin);
+		}
 		switch(parse_input(putin)) {
 		case 'y':
 			itor = parse_ip(putin);
+			PRINT_MATCH_IP_MSG(&func_start, &func_end, want, file_ip, &is_show, &cnt, &pos, itor);
 			break;
 		case 'f':
 			parse_file(putin);
 			itor = parse_ip(putin);
+			PRINT_MATCH_IP_MSG(&func_start, &func_end, want, file_ip, &is_show, &cnt, &pos, itor);
 			break;
 		case 'q':
 			goto main_exit;
@@ -82,22 +112,12 @@ int main(int agrc, char *argv[]) {
 		default:
 			printf("%sInput error!%s\nPlease check up and input the IP address again: ",
 				   T_COLOR_LIGHT_RED, T_COLOR_NONE);
-			goto fail_parse_input;
+			if(has_command)
+				goto main_exit;
+			else
+				goto fail_parse_input;
 		}
-
-		// match and print ip massage
-		putchar('\n');
-		do {
-			want = (ip *)get_next(itor);
-			mingw_gettimeofday(&func_start, NULL);
-			pos = match_ip(want, file_ip);
-			mingw_gettimeofday(&func_end, NULL);
-			unsigned long timer = 1000000 * (func_end.tv_sec - func_start.tv_sec) +
-								  func_end.tv_usec - func_start.tv_usec;
-			putout_ip_msg(&is_show, ++cnt, want, &pos, timer);
-		} while(has_next(itor));
-		iterator_free(itor);
-	}
+	} while(!has_command);
 
 // end of ip-query
 main_exit : {
