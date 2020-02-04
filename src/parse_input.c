@@ -49,10 +49,11 @@ static bool ip_list_has_next(void *container_instance, void *container_inner_ito
 static void *ip_list_get_next(void *container_instance, void *container_inner_itor) {
 	inner_itor *p	= (inner_itor *)container_inner_itor;
 	ip *		item = p->item;
+	ip *		next = item->next;
+	free(item);
+	p->item = next;
 
-	p->item = item->next;
-
-	return p->item;
+	return next;
 }
 
 char *parse_file(char *des) {
