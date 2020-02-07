@@ -16,12 +16,18 @@
 * [x] 支持文件操作（从文件输入）
 * [x] 支持通配符
 * [x] 支持命令行
+* [x] 更快的查询速度
 * [ ] 小内存情况下查询处理
-* [ ] 更快的查询速度
 * [ ] 适配 Linux
 * [ ] 支持显示排序，比如按省份排序之类的
 
 ## Change Log
+
+### 0.9.0 (2020-02-07)
+
+* 加快查询速度（加快至少 1000 倍）
+
+* 优化内存占用
 
 ### 0.8.2 (2020-02-04)
 
@@ -89,7 +95,7 @@
 
 * 实现 a.b.c.d 形式的单次查询
 
-## 感谢
+## 感谢与第三方库
 
 1.[iniparser](https://github.com/ndevilla/iniparser)
 
@@ -97,7 +103,13 @@
 
     - License: MIT
 
-2.[map](https://github.com/Broadroad/map)
+2.rbtree
+
+    - Aother: (C) 1999  Andrea Arcangeli <andrea@suse.de>, (C) 2002  David Woodhouse <dwmw2@infradead.org>
+
+    - License: GPL
+
+3.[map](https://github.com/Broadroad/map)
 
     - Aother: [Broadroad](https://github.com/Broadroad), Andrea Arcangeli <andrea@suse.de>
 
