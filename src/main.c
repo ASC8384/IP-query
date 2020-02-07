@@ -14,32 +14,20 @@ void PUTOUT_IP_MSG(const show_msg *is_show, const unsigned long cnt, const ip *w
 				   const ip_msg *pos, const unsigned long timer) {
 	printf("%s[%lu]%s %s%hu.%hu.%hu.%hu%s ", T_COLOR_ORANGE, cnt, T_COLOR_NONE, T_COLOR_LIGHT_CYAN,
 		   want->ip[0], want->ip[1], want->ip[2], want->ip[3], T_COLOR_NONE);
-	if(is_show->country) {
-		for(int i = 1; i <= pos->country_num; i++)
-			putchar(pos->country[i]);
-		putchar(' ');
-	}
-	if(is_show->province) {
-		for(int i = 1; i <= pos->province_num; i++)
-			putchar(pos->province[i]);
-		putchar(' ');
-	}
-	if(is_show->city) {
-		for(int i = 1; i <= pos->city_num; i++)
-			putchar(pos->city[i]);
-		putchar(' ');
-	}
-	if(is_show->isp) {
-		for(int i = 1; i <= pos->isp_num; i++)
-			putchar(pos->isp[i]);
-		putchar(' ');
-	}
+	if(is_show->country)
+		printf("%s ", pos->country);
+	if(is_show->province)
+		printf("%s ", pos->province);
+	if(is_show->city)
+		printf("%s ", pos->city);
+	if(is_show->isp)
+		printf("%s ", pos->isp);
 	printf("| query time = %ld ms\n", timer / 1000);
 }
 
 // match and print ip massage
 void PRINT_MATCH_IP_MSG(struct timeval *func_start, struct timeval *func_end, ip *want,
-						char *file_ip, show_msg *is_show, unsigned long *cnt, ip_msg *pos,
+						ipdb *file_ip, show_msg *is_show, unsigned long *cnt, ip_msg *pos,
 						iterator *itor) {
 	putchar('\n');
 	do {
@@ -54,16 +42,15 @@ void PRINT_MATCH_IP_MSG(struct timeval *func_start, struct timeval *func_end, ip
 	iterator_free(itor);
 }
 
-char *read_all_file(char *filename) {
-	char *text = NULL;
-	FILE *fp   = fopen(filename, "r");
+ipdb *read_all_file(char *filename) {
+	ipdb *text = NULL;
+	FILE *fp   = fopen(filename, "rb");
 	fseek(fp, 0, SEEK_END);
 	unsigned long long file_len;
 	file_len = ftell(fp);
-	text	 = (char *)malloc(file_len + 1);
+	text	 = malloc(file_len);
 	rewind(fp);
-	fread(text, sizeof(char), file_len, fp);
-	text[file_len] = '\0';
+	fread(text, sizeof(ipdb), file_len, fp);
 	fclose(fp);
 	return text;
 }
@@ -72,7 +59,7 @@ int main(int argc, char *argv[]) {
 	struct timeval func_start;
 	struct timeval func_end;
 	dictionary *   ini		= NULL;
-	char *		   file_ip  = NULL;
+	ipdb *		   file_ip  = NULL;
 	char *		   ini_name = NULL;
 	ip *		   want		= NULL;
 	ip_msg		   pos;
@@ -88,7 +75,7 @@ int main(int argc, char *argv[]) {
 	iniparser_get_is_show(ini, &is_show);
 
 	printf("Welcome to IP-query!");
-	file_ip = read_all_file("C:/Code/IP-query/src/common/ip.txt");
+	file_ip = read_all_file("C:/Code/IP-query/src/common/ip.db");
 
 	char putin[256];
 	putin[0] = '\0';
