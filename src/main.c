@@ -2,7 +2,13 @@
 #include "ip_match.h"
 #include "parse_input.h"
 #include <stdio.h>
+
+#ifdef _WIN32
 #include <time.h>
+#define gettimeofday(func, NULL) mingw_gettimeofday(func, NULL)
+#else
+#include <sys/time.h>
+#endif
 
 // output colors
 #define T_COLOR_NONE "\033[0m"
@@ -32,9 +38,9 @@ void PRINT_MATCH_IP_MSG(struct timeval *func_start, struct timeval *func_end, ip
 	putchar('\n');
 	do {
 		want = (ip *)get_next(itor);
-		mingw_gettimeofday(func_start, NULL);
+		gettimeofday(func_start, NULL);
 		*pos = match_ip(want, file_ip);
-		mingw_gettimeofday(func_end, NULL);
+		gettimeofday(func_end, NULL);
 		unsigned long timer = 1000000 * (func_end->tv_sec - func_start->tv_sec) +
 							  func_end->tv_usec - func_start->tv_usec;
 		PUTOUT_IP_MSG(is_show, ++(*cnt), want, pos, timer);
@@ -75,7 +81,7 @@ int main(int argc, char *argv[]) {
 	iniparser_get_is_show(ini, &is_show);
 
 	printf("Welcome to IP-query!");
-	file_ip = read_all_file("C:/Code/IP-query/src/common/ip.db");
+	file_ip = read_all_file("./src/common/ip.db");
 
 	char putin[256];
 	putin[0] = '\0';

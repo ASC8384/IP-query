@@ -28,7 +28,7 @@ typedef struct IpMessage {
 } ip_msg;
 
 bool   IS_MATCH(const ip *want, const ip_msg *pos);
-ip_msg NEXT_IP(ipdb *buffer, unsigned int len);
+ip_msg NEXT_IP(const ipdb *buffer, unsigned int len);
 
 ip_msg match_ip(const ip *want, const ipdb *fp);
 

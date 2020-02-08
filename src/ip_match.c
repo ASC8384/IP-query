@@ -8,7 +8,7 @@ bool IS_MATCH(const ip *want, const ip_msg *pos) {
 			pos->ip_start[0] <= want->ip[0] && want->ip[0] <= pos->ip_end[0]);
 }
 
-ip_msg NEXT_IP(ipdb *buffer, unsigned int len) {
+ip_msg NEXT_IP(const ipdb *buffer, unsigned int len) {
 	int	c;
 	ip_msg pos;
 	memset(&pos, 0, sizeof(pos));
@@ -48,7 +48,7 @@ ip_msg match_ip(const ip *want, const ipdb *fp) {
 	unsigned int left  = 0;
 	unsigned int right = total_block;
 	unsigned int data  = 0;
-	ipdb *		 buffer;
+	const ipdb * buffer;
 	while(left <= right) {
 		unsigned int mid = (left + right) / 2;
 		unsigned int pos = first_index + mid * 8;
