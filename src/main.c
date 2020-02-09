@@ -1,13 +1,30 @@
 #include "ini_load.h"
 #include "ip_match.h"
 #include "parse_input.h"
+#include <stdint.h>
 #include <stdio.h>
 
 #ifdef _WIN32
+#include <conio.h>
 #include <time.h>
 #define gettimeofday(func, NULL) mingw_gettimeofday(func, NULL)
 #else
 #include <sys/time.h>
+#include <termios.h>
+#include <unistd.h>
+int getch(void) {
+	int			   ch;
+	struct termios oldt, newt;
+
+	tcgetattr(STDIN_FILENO, &oldt);
+	newt = oldt;
+	newt.c_lflag &= ~(ICANON | ECHO);
+	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+	ch = getchar();
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+
+	return ch;
+}
 #endif
 
 // output colors
@@ -15,6 +32,7 @@
 #define T_COLOR_ORANGE "\033[0;33m" // BROWN
 #define T_COLOR_LIGHT_CYAN "\033[1;36m"
 #define T_COLOR_LIGHT_RED "\033[1;31m"
+#define T_COLOR_WHITE_BACKGROUND "\033[7m"
 
 void PUTOUT_IP_MSG(const show_msg *is_show, const unsigned long cnt, const ip *want,
 				   const ip_msg *pos, const unsigned long timer) {
@@ -28,22 +46,47 @@ void PUTOUT_IP_MSG(const show_msg *is_show, const unsigned long cnt, const ip *w
 		printf("%s ", pos->city);
 	if(is_show->isp)
 		printf("%s ", pos->isp);
-	printf("| query time = %ld ms\n", timer / 1000);
+	printf("| query time = %.3lf ms\n", timer / 1000.0);
 }
 
 // match and print ip massage
-void PRINT_MATCH_IP_MSG(struct timeval *func_start, struct timeval *func_end, ip *want,
-						ipdb *file_ip, show_msg *is_show, unsigned long *cnt, ip_msg *pos,
-						iterator *itor) {
+void QUERY_IP(ipdb *file_ip, show_msg *is_show, unsigned long *cnt, iterator *itor) {
+	struct timeval func_start;
+	struct timeval func_end;
+	ip *		   want;
+	ip_msg		   pos;
+	uint32_t	   query_num;
+	query_num = 0;
+
 	putchar('\n');
 	do {
+		query_num++;
 		want = (ip *)get_next(itor);
-		gettimeofday(func_start, NULL);
-		*pos = match_ip(want, file_ip);
-		gettimeofday(func_end, NULL);
-		unsigned long timer = 1000000 * (func_end->tv_sec - func_start->tv_sec) +
-							  func_end->tv_usec - func_start->tv_usec;
-		PUTOUT_IP_MSG(is_show, ++(*cnt), want, pos, timer);
+		gettimeofday(&func_start, NULL);
+		pos = match_ip(want, file_ip);
+		gettimeofday(&func_end, NULL);
+		unsigned long timer =
+			1000000 * (func_end.tv_sec - func_start.tv_sec) + func_end.tv_usec - func_start.tv_usec;
+		PUTOUT_IP_MSG(is_show, ++(*cnt), want, &pos, timer);
+		if(query_num % 24 == 0) {
+			printf("%s-- More --%s ", T_COLOR_WHITE_BACKGROUND, T_COLOR_NONE);
+			char c;
+			while(c = getch()) {
+				if(c == 'q')
+					return;
+				if(c == '\n') {
+					break;
+				}
+				if(c == ' ') {
+					break;
+				}
+				if(c == 'j') {
+					query_num--;
+					break;
+				}
+			}
+			putchar('\n');
+		}
 	} while(has_next(itor));
 	iterator_free(itor);
 }
@@ -62,15 +105,11 @@ ipdb *read_all_file(char *filename) {
 }
 
 int main(int argc, char *argv[]) {
-	struct timeval func_start;
-	struct timeval func_end;
-	dictionary *   ini		= NULL;
-	ipdb *		   file_ip  = NULL;
-	char *		   ini_name = NULL;
-	ip *		   want		= NULL;
-	ip_msg		   pos;
-	show_msg	   is_show;
-	bool		   has_command = false;
+	dictionary *ini		 = NULL;
+	ipdb *		file_ip  = NULL;
+	char *		ini_name = NULL;
+	show_msg	is_show;
+	bool		has_command = false;
 
 	// process ini
 	ini_name = "ip-query.ini";
@@ -108,7 +147,7 @@ int main(int argc, char *argv[]) {
 			parse_file(putin);
 		case 'y':
 			itor = parse_ip(putin);
-			PRINT_MATCH_IP_MSG(&func_start, &func_end, want, file_ip, &is_show, &cnt, &pos, itor);
+			QUERY_IP(file_ip, &is_show, &cnt, itor);
 			break;
 		case 'q':
 			goto main_exit;
