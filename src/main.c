@@ -4,11 +4,17 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#ifdef _WIN32
+#if(defined(_WIN32) || defined(_WINDOWS_) || defined(__WINDOWS_))
+#define OS_WINDOW
+#else
+#define OS_LINUX
+#endif
+
+#ifdef OS_WINDOW
 #include <conio.h>
 #include <time.h>
 #define gettimeofday(func, NULL) mingw_gettimeofday(func, NULL)
-#else
+#elif OS_LINUX
 #include <sys/time.h>
 #include <termios.h>
 #include <unistd.h>
@@ -72,20 +78,18 @@ void QUERY_IP(ipdb *file_ip, show_msg *is_show, unsigned long *cnt, iterator *it
 			printf("%s-- More --%s ", T_COLOR_WHITE_BACKGROUND, T_COLOR_NONE);
 			char c;
 			while(c = getch()) {
-				if(c == 'q')
+				if(c == 'q') {
+					printf("\r%*s", 10, " ");
 					return;
-				if(c == '\n') {
-					break;
 				}
-				if(c == ' ') {
+				if(c == ' ')
 					break;
-				}
 				if(c == 'j') {
 					query_num--;
 					break;
 				}
 			}
-			putchar('\n');
+			putchar('\r');
 		}
 	} while(has_next(itor));
 	iterator_free(itor);
