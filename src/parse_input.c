@@ -2,8 +2,8 @@
  * @file 		parse_input.c
  * @brief 		解析输入
  * @author 		ASC_8384<ASC_8384@foxmail.com>
- * @version    	1.1.2
- * @date       	2020-02-09
+ * @version    	1.1.4
+ * @date       	2020-02-10
  */
 #include "parse_input.h"
 
@@ -79,8 +79,8 @@ void IP_LIST_INSERT_WILDCARD(const char *result, ip **current) {
 			break;
 		i++;
 	}
-	char *   exstring = NULL;
-	uint32_t st, ed;
+	char *   exstring = NULL; // 将通配符扩展开来的字符串
+	uint32_t st, ed;		  // ip 的开始与结束的地址
 	// 具有'?'
 	if(has_wildcard_question_mark) {
 		exstring = malloc(strlen(copy) * 10 + 10); // 总共 10 个
@@ -92,21 +92,23 @@ void IP_LIST_INSERT_WILDCARD(const char *result, ip **current) {
 		st		 = 0;
 		ed		 = 255;
 	}
-	exstring[0] = '\0';
-	copy[i]		= '\0';
-	char numstr[5];
+	exstring[0] = '\0'; // 初始化
+	copy[i]		= '\0'; // 初始化
+	char numstr[5];		// 当前通配符代表的数字
 	while(st <= ed) {
-		strcat(exstring, copy);
-		itoa(st, numstr, 10);
-		strcat(exstring, numstr);
-		strcat(exstring, copy + i + 1);
-		strcat(exstring, " ");
+		strcat(exstring, copy);			// 插入通配符之前的串
+		sprintf(numstr, "%d", st);		// 当前通配符代表的数字转为字符串
+		strcat(exstring, numstr);		// 插入当前通配符代表的数字
+		strcat(exstring, copy + i + 1); // 插入通配符之后的串
+		strcat(exstring, " ");			// 分割
 		st++;
 	}
+	// 分割生成的字符串
 	char delims[] = " \t\n";
 	copy		  = strtok(exstring, delims);
 	while(copy != NULL) {
 		ip node;
+		// 读入链表
 		sscanf(copy, "%hu.%hu.%hu.%hu", &node.ip[0], &node.ip[1], &node.ip[2], &node.ip[3]);
 		IP_LIST_INSERT(&node, *current);
 		*current = (*current)->next; // 更新链表

@@ -26,7 +26,7 @@ int get_terminal_high(void) {
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
 	return csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
 }
-#elif OS_LINUX
+#else
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <termios.h>

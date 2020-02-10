@@ -2,8 +2,8 @@
  * @file 		parse_input.h
  * @brief 		解析输入
  * @author 		ASC_8384<ASC_8384@foxmail.com>
- * @version    	1.1.2
- * @date       	2020-02-09
+ * @version    	1.1.4
+ * @date       	2020-02-10
  */
 #ifndef PAESE_INPUT_H_
 #define PAESE_INPUT_H_
