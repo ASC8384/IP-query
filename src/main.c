@@ -1,3 +1,10 @@
+/**
+ * @file 		main.c
+ * @brief 		主函数，构建 IP 地址查询系统
+ * @author 		ASC_8384<ASC_8384@foxmail.com>
+ * @version    	1.1.6
+ * @date       	2020-02-10
+ */
 #include "ini_load.h"
 #include "ip_match.h"
 #include "parse_input.h"
