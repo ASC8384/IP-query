@@ -1,3 +1,10 @@
+/**
+ * @file 		parse_input.c
+ * @brief 		解析输入
+ * @author 		ASC_8384<ASC_8384@foxmail.com>
+ * @version    	1.1.2
+ * @date       	2020-02-09
+ */
 #include "parse_input.h"
 
 bool IP_LIST_INSERT(ip *item, ip *list) {
@@ -125,7 +132,10 @@ char parse_input(const char *putin) {
 		ip st, ed;
 		sscanf(putin, "%hu.%hu.%hu.%hu-%hu.%hu.%hu.%hu", &st.ip[0], &st.ip[1], &st.ip[2], &st.ip[3],
 			   &ed.ip[0], &ed.ip[1], &ed.ip[2], &ed.ip[3]);
-		if(st.ip[0] > ed.ip[0] || st.ip[1] > ed.ip[1] || st.ip[2] > ed.ip[2] || st.ip[3] > ed.ip[3])
+		if(ed.ip[0] < st.ip[0] || (ed.ip[0] == st.ip[0] && ed.ip[1] < st.ip[1]) ||
+		   (ed.ip[0] == st.ip[0] && ed.ip[1] == st.ip[1] && ed.ip[2] < st.ip[2]) ||
+		   (ed.ip[0] == st.ip[0] && ed.ip[1] == st.ip[1] && ed.ip[2] == st.ip[2] &&
+			ed.ip[3] < st.ip[3]))
 			return 'w';
 	}
 	return 'y';
