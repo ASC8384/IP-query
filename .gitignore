@@ -42,3 +42,6 @@ build/
 
 # ini
 *.ini
+
+# Word
+*.docx

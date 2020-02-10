@@ -137,7 +137,9 @@ void putout_info(const char *info, FILE *fp) { fwrite(info, strlen(info), 1, fp)
 
 /**
  * @brief 制作记录区和索引区
- * @param 参数
+ * @param name_source ip源文件名
+ * @param name_info ip地址文件名
+ * @param name_ip ip索引文件名
  */
 void make_info(const char *name_source, const char *name_info, const char *name_ip) {
 	FILE *file_info = fopen(name_info, "wb");
