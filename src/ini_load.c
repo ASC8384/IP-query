@@ -26,7 +26,7 @@ void iniparser_save(const dictionary *ini, const char *inipath) {
  */
 void iniparser_init(const char *ini_name, const char *init_string, dictionary **ini) {
 	FILE *file_ini = fopen(ini_name, "w");
-	fprintf(file_ini, init_string); // 将初始化的内容写入 ini 文件
+	fprintf(file_ini,"%s", init_string); // 将初始化的内容写入 ini 文件
 	fclose(file_ini);
 	// 加载 ini 文件
 	*ini = iniparser_load(ini_name);

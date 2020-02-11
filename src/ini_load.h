@@ -10,6 +10,7 @@
 
 #include "iniparser.h"
 #include <stdbool.h>
+#include <stdio.h>
 
 /**
  * @brief 定义显示信息的结构体
