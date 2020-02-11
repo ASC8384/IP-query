@@ -4,6 +4,13 @@ cmake_minimum_required (VERSION 2.8)
 # 项目信息
 project (IP-query)
 
+# 设置可执行文件的输出目录
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/./bin)
+
+#设置版本号
+set (Demo_VERSION_MAJOR 1.1)
+set (Demo_VERSION_MINOR 6)
+
 # 头文件
 include_directories(./lib/iniparser)
 
@@ -15,7 +22,7 @@ aux_source_directory(./src DIR_SRCS)
 add_subdirectory(./lib/iniparser)
 
 # 指定生成目标
-add_executable(main ${DIR_SRCS})
+add_executable(ipquery ${DIR_SRCS})
 
 # 添加链接库
-target_link_libraries(main iniparser)
+target_link_libraries(ipquery iniparser)

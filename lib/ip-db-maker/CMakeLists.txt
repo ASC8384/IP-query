@@ -4,6 +4,10 @@ cmake_minimum_required (VERSION 2.8)
 # 项目信息
 project (IPdb-make)
 
+#设置版本号
+set (Demo_VERSION_MAJOR 1)
+set (Demo_VERSION_MINOR 0)
+
 # 设置可执行文件的输出目录
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/./bin)
 

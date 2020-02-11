@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
 
 	// 输出欢迎词
 	printf("Welcome to IP-query!");
-	file_ip = ipdb_init("./src/common/ip.db");
+	file_ip = ipdb_init("./ip.db");
 	// 获取输入
 	char putin[256];
 	putin[0] = '\0';
