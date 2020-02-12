@@ -18,6 +18,7 @@ make
 ### 使用
 
 ``` BASH
+cp ./src/ip.db ./bin
 ./bin/ipquery
 ```
 
